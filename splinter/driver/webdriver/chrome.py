@@ -4,6 +4,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+import os
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from splinter.driver.webdriver import BaseWebDriver, WebDriverElement
@@ -14,19 +15,21 @@ class WebDriver(BaseWebDriver):
 
     driver_name = "Chrome"
 
-    def __init__(self, user_agent=None, wait_time=2, fullscreen=False, incognito=False,
+    def __init__(self, user_agent=None, wait_time=2, fullscreen=False,
                  **kwargs):
 
         options = Options()
 
         if user_agent is not None:
             options.add_argument("--user-agent=" + user_agent)
-            
-        if incognito is not None:
-            options.add_argument("--incognito")
 
         if fullscreen:
             options.add_argument('--kiosk')
+
+        proxy = kwargs.pop('proxy', None) or os.environ.get('CHROME_DRIVER_PROXY')
+        if proxy:
+            options.add_argument('--proxy-server={}'.format(proxy))
+
 
         self.driver = Chrome(chrome_options=options, **kwargs)
 
